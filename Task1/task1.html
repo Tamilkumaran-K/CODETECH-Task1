@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(to right, #4e31b6, #7c6bca, #b6a9f0);
+            color: #333;
+            transition: background 0.5s;
+        }
+        .quiz-container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header img {
+            width: 100px;
+            border-radius: 50%;
+        }
+        .header h1 {
+            font-size: 2em;
+            margin: 10px 0;
+        }
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .form-container input {
+            margin: 10px 0;
+            padding: 10px;
+            width: 80%;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+        .form-container input:focus {
+            border-color: #4caf50;
+            outline: none;
+        }
+        .form-container button {
+            padding: 10px 20px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .form-container button:hover {
+            background: #45a049;
+        }
+        .themes-container {
+            display: none;
+            width: 94%;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 16px;
+            text-align: center;
+        }
+        .themes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+        .theme-box {
+            padding: 20px;
+            background: #ffeb3b;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .theme-box:hover {
+            transform: scale(1.05);
+            background: #ffc107;
+        }
+        .difficulty-container {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .difficulty-container button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 8px;
+            border: none;
+            color: white;
+            background: #007bff;
+            transition: background 0.3s;
+        }
+        .difficulty-container button:hover {
+            background: #0056b3;
+        }
+        .question {
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            text-align: center;
+        }
+        .options-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 16px;
+        }
+        .option-box {
+        width: 48%;
+        margin-bottom: 10px;
+        padding: 20px;
+        background: #007bff;
+        color: white;
+        text-align: center;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.3s;
+        display: flex; /* Add flexbox */
+        justify-content: center; /* Center content horizontally */
+        align-items: center; /* Center content vertically */
+    }
+    .option-box:hover, .option-box:focus {
+        background: #0056b3;
+    }
+        }
+        .result {
+            font-size: 1.2em;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .timer {
+            font-size: 1.2em;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #d9534f;
+        }
+
+        /* Background Animations */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .leaves {
+            background: url('leaves.png') repeat;
+            animation: moveLeaves 5s linear infinite;
+        }
+
+        .flames {
+            background: url('flames.png') repeat;
+            animation: flicker 2s linear infinite;
+        }
+
+        @keyframes moveLeaves {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 100% 100%;
+            }
+        }
+
+        @keyframes flicker {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div class="header">
+            <img src="quiz.avif" alt="Quiz Logo">
+            <h1>Interactive Quiz</h1>
+        </div>
+        <div id="user-details" class="form-container">
+            <input type="text" id="name" placeholder="Enter your name" aria-label="Enter your name" required>
+            <input type="number" id="age" placeholder="Enter your age" aria-label="Enter your age" min="1" required>
+            <button onclick="proceedToTheme()">Next</button>
+        </div>
+        <div id="theme-selection" class="themes-container">
+            <div class="themes-grid">
+                <div class="theme-box" onclick="selectTheme('science')" role="button" tabindex="0">Science</div>
+                <div class="theme-box" onclick="selectTheme('history')" role="button" tabindex="0">History</div>
+                <div class="theme-box" onclick="selectTheme('geography')" role="button" tabindex="0">Geography</div>
+                <div class="theme-box" onclick="selectTheme('general')" role="button" tabindex="0">General</div>
+            </div>
+        </div>
+        <div id="difficulty-selection" class="difficulty-container">
+            <button onclick="setDifficulty('easy')">Easy</button>
+            <button onclick="setDifficulty('hard')">Hard</button>
+        </div>
+        <div id="quiz" style="display: none;">
+            <!-- Quiz content dynamically loaded here -->
+        </div>
+        <div id="result" class="result" style="display: none;">
+            <!-- Result displayed here -->
+        </div>
+        <div id="play-again" class="result" style="display: none;">
+            <div>Wanna play again?</div>
+            <button onclick="restartQuiz()">Yes</button>
+            <button onclick="exitQuiz()">No</button>
+        </div>
+        <div id="timer" class="timer" style="display: none;">Time Left: <span id="time-left">10</span>s</div>
+    </div>
+
+    <div id="background-animation" class="background-animation"></div>
+
+    <script>
+        const quizThemes = {
+            science: [
+                {
+                    question: "What is the chemical symbol for water?",
+                    options: ["H2O", "CO2", "O2", "NaCl"],
+                    answer: 0
+                },
+                {
+                    question: "What planet is known as the Red Planet?",
+                    options: ["Earth", "Mars", "Venus", "Jupiter"],
+                    answer: 1
+                }
+            ],
+            history: [
+                {
+                    question: "Who was the first President of the United States?",
+                    options: ["Abraham Lincoln", "Thomas Jefferson", "George Washington", "John Adams"],
+                    answer: 2
+                },
+                {
+                    question: "What year did World War II end?",
+                    options: ["1941", "1945", "1949", "1955"],
+                    answer: 1
+                }
+            ],
+            geography: [
+                {
+                    question: "What is the largest continent?",
+                    options: ["Africa", "Asia", "Europe", "Antarctica"],
+                    answer: 1
+                },
+                {
+                    question: "What is the capital of Japan?",
+                    options: ["Seoul", "Beijing", "Bangkok", "Tokyo"],
+                    answer: 3
+                }
+            ],
+            general: [
+                {
+                    question: "How many days are in a leap year?",
+                    options: ["365", "366", "364", "367"],
+                    answer: 1
+                },
+                {
+                    question: "What is the speed of light?",
+                    options: ["300,000 km/s", "150,000 km/s", "450,000 km/s", "600,000 km/s"],
+                    answer: 0
+                }
+            ]
+        };
+
+        const userDetailsContainer = document.getElementById('user-details');
+        const themeSelectionContainer = document.getElementById('theme-selection');
+        const difficultySelectionContainer = document.getElementById('difficulty-selection');
+        const quizContainer = document.getElementById('quiz');
+        const resultContainer = document.getElementById('result');
+        const playAgainContainer = document.getElementById('play-again');
+        const timerContainer = document.getElementById('timer');
+        const timeLeftSpan = document.getElementById('time-left');
+        const backgroundAnimation = document.getElementById('background-animation');
+        
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let userName = '';
+        let selectedTheme = '';
+        let quizData = [];
+        let timerInterval;
+        let timeLeft = 10;
+
+        function proceedToTheme() {
+            const nameInput = document.getElementById('name').value.trim();
+            const ageInput = parseInt(document.getElementById('age').value);
+
+            if (!nameInput || isNaN(ageInput) || ageInput <= 0) {
+                alert('Please provide a valid name and age.');
+                return;
+            }
+
+            userName = nameInput;
+            userDetailsContainer.style.display = 'none';
+            themeSelectionContainer.style.display = 'block';
+        }
+
+        function selectTheme(theme) {
+            selectedTheme = theme;
+            themeSelectionContainer.style.display = 'none';
+            difficultySelectionContainer.style.display = 'block';
+        }
+
+        function setDifficulty(level) {
+            if (level === 'easy') {
+                document.body.style.background = 'green';
+                backgroundAnimation.classList.add('leaves');
+                backgroundAnimation.classList.remove('flames');
+            } else if (level === 'hard') {
+                document.body.style.background = ' red';
+                backgroundAnimation.classList.add('flames');
+                backgroundAnimation.classList.remove('leaves');
+            }
+
+            quizData = quizThemes[selectedTheme];
+            difficultySelectionContainer.style.display = 'none';
+            quizContainer.style.display = 'block';
+            timerContainer.style.display = 'block';
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            clearInterval(timerInterval);
+            timeLeft = 10;
+
+            const questionData = quizData[currentQuestionIndex];
+            quizContainer.innerHTML = `
+                <div class="question">${questionData.question}</div>
+                <div class="options-container">
+                    ${questionData.options.map((option, index) => `
+                        <div class="option-box" onclick="checkAnswer(${index})" tabindex="0" role="button">
+                            ${option}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            startTimer();
+        }
+
+        function startTimer() {
+            timeLeftSpan.textContent = timeLeft;
+            timerInterval = setInterval(() => {
+                timeLeft -= 1;
+                timeLeftSpan.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    checkAnswer(-1); // Timeout condition
+                }
+            }, 1000);
+        }
+
+        function checkAnswer(selectedIndex) {
+            clearInterval(timerInterval);
+
+            const correctIndex = quizData[currentQuestionIndex].answer;
+            if (selectedIndex === correctIndex) {
+                score += 1;
+            }
+
+            currentQuestionIndex += 1;
+
+            if (currentQuestionIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            quizContainer.style.display = 'none';
+            timerContainer.style.display = 'none';
+            resultContainer.style.display = 'block';
+            resultContainer.textContent = `Congratulations ${userName}, you scored ${score} out of ${quizData.length}`;
+            playAgainContainer.style.display = 'block';
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            userName = '';
+            selectedTheme = '';
+            quizData = [];
+            userDetailsContainer.style.display = 'block';
+            themeSelectionContainer.style.display = 'none';
+            difficultySelectionContainer.style.display = 'none';
+            quizContainer.style.display = 'none';
+            resultContainer.style.display = 'none';
+            playAgainContainer.style.display = 'none';
+            timerContainer.style.display = 'none';
+            document.body.style.background = 'linear-gradient(to right, #4e31b6, #7c6bca, #b6a9f0)';
+            backgroundAnimation.classList.remove('leaves', 'flames');
+        }
+
+        function exitQuiz() {
+            alert('Thanks for playing!');
+            restartQuiz();
+        }
+    </script>
+</body>
+</html>
+
+
+
+
