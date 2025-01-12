@@ -124,22 +124,21 @@
             border-radius: 16px;
         }
         .option-box {
-        width: 48%;
-        margin-bottom: 10px;
-        padding: 20px;
-        background: #007bff;
-        color: white;
-        text-align: center;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: background 0.3s;
-        display: flex; /* Add flexbox */
-        justify-content: center; /* Center content horizontally */
-        align-items: center; /* Center content vertically */
-    }
-    .option-box:hover, .option-box:focus {
-        background: #0056b3;
-    }
+            width: 48%;
+            margin-bottom: 10px;
+            padding: 20px;
+            background: #007bff;
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .option-box:hover, .option-box:focus {
+            background: #0056b3;
         }
         .result {
             font-size: 1.2em;
@@ -152,8 +151,6 @@
             margin-bottom: 20px;
             color: #d9534f;
         }
-
-        /* Background Animations */
         .background-animation {
             position: fixed;
             top: 0;
@@ -163,17 +160,14 @@
             overflow: hidden;
             z-index: -1;
         }
-
         .leaves {
             background: url('leaves.png') repeat;
             animation: moveLeaves 5s linear infinite;
         }
-
         .flames {
             background: url('flames.png') repeat;
             animation: flicker 2s linear infinite;
         }
-
         @keyframes moveLeaves {
             0% {
                 background-position: 0 0;
@@ -182,7 +176,6 @@
                 background-position: 100% 100%;
             }
         }
-
         @keyframes flicker {
             0%, 100% {
                 opacity: 1;
@@ -216,12 +209,8 @@
             <button onclick="setDifficulty('easy')">Easy</button>
             <button onclick="setDifficulty('hard')">Hard</button>
         </div>
-        <div id="quiz" style="display: none;">
-            <!-- Quiz content dynamically loaded here -->
-        </div>
-        <div id="result" class="result" style="display: none;">
-            <!-- Result displayed here -->
-        </div>
+        <div id="quiz" style="display: none;"></div>
+        <div id="result" class="result" style="display: none;"></div>
         <div id="play-again" class="result" style="display: none;">
             <div>Wanna play again?</div>
             <button onclick="restartQuiz()">Yes</button>
@@ -229,9 +218,7 @@
         </div>
         <div id="timer" class="timer" style="display: none;">Time Left: <span id="time-left">10</span>s</div>
     </div>
-
     <div id="background-animation" class="background-animation"></div>
-
     <script>
         const quizThemes = {
             science: [
@@ -293,7 +280,6 @@
         const timerContainer = document.getElementById('timer');
         const timeLeftSpan = document.getElementById('time-left');
         const backgroundAnimation = document.getElementById('background-animation');
-        
         let currentQuestionIndex = 0;
         let score = 0;
         let userName = '';
@@ -305,12 +291,10 @@
         function proceedToTheme() {
             const nameInput = document.getElementById('name').value.trim();
             const ageInput = parseInt(document.getElementById('age').value);
-
             if (!nameInput || isNaN(ageInput) || ageInput <= 0) {
                 alert('Please provide a valid name and age.');
                 return;
             }
-
             userName = nameInput;
             userDetailsContainer.style.display = 'none';
             themeSelectionContainer.style.display = 'block';
@@ -328,11 +312,10 @@
                 backgroundAnimation.classList.add('leaves');
                 backgroundAnimation.classList.remove('flames');
             } else if (level === 'hard') {
-                document.body.style.background = ' red';
+                document.body.style.background = 'red';
                 backgroundAnimation.classList.add('flames');
                 backgroundAnimation.classList.remove('leaves');
             }
-
             quizData = quizThemes[selectedTheme];
             difficultySelectionContainer.style.display = 'none';
             quizContainer.style.display = 'block';
@@ -343,7 +326,6 @@
         function loadQuestion() {
             clearInterval(timerInterval);
             timeLeft = 10;
-
             const questionData = quizData[currentQuestionIndex];
             quizContainer.innerHTML = `
                 <div class="question">${questionData.question}</div>
@@ -355,7 +337,6 @@
                     `).join('')}
                 </div>
             `;
-
             startTimer();
         }
 
@@ -366,21 +347,18 @@
                 timeLeftSpan.textContent = timeLeft;
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
-                    checkAnswer(-1); // Timeout condition
+                    checkAnswer(-1);
                 }
             }, 1000);
         }
 
         function checkAnswer(selectedIndex) {
             clearInterval(timerInterval);
-
             const correctIndex = quizData[currentQuestionIndex].answer;
             if (selectedIndex === correctIndex) {
                 score += 1;
             }
-
             currentQuestionIndex += 1;
-
             if (currentQuestionIndex < quizData.length) {
                 loadQuestion();
             } else {
@@ -409,18 +387,12 @@
             resultContainer.style.display = 'none';
             playAgainContainer.style.display = 'none';
             timerContainer.style.display = 'none';
-            document.body.style.background = 'linear-gradient(to right, #4e31b6, #7c6bca, #b6a9f0)';
-            backgroundAnimation.classList.remove('leaves', 'flames');
         }
 
         function exitQuiz() {
-            alert('Thanks for playing!');
+            alert('Thanks  for playing!');
             restartQuiz();
         }
     </script>
 </body>
 </html>
-
-
-
-
